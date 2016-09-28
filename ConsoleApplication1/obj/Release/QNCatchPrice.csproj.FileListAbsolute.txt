@@ -1,0 +1,8 @@
+E:\工作目录\QN\新建文件夹\ConsoleApplication1\ConsoleApplication1\bin\Release\ConsoleApplication1.exe.config
+E:\工作目录\QN\新建文件夹\ConsoleApplication1\ConsoleApplication1\bin\Release\ConsoleApplication1.exe
+E:\工作目录\QN\新建文件夹\ConsoleApplication1\ConsoleApplication1\bin\Release\ConsoleApplication1.pdb
+E:\工作目录\QN\新建文件夹\ConsoleApplication1\ConsoleApplication1\bin\Release\Newtonsoft.Json.dll
+E:\工作目录\QN\新建文件夹\ConsoleApplication1\ConsoleApplication1\bin\Release\Newtonsoft.Json.xml
+E:\工作目录\QN\新建文件夹\ConsoleApplication1\ConsoleApplication1\obj\Release\ConsoleApplication1.exe
+E:\工作目录\QN\新建文件夹\ConsoleApplication1\ConsoleApplication1\obj\Release\ConsoleApplication1.pdb
+E:\工作目录\QN\新建文件夹\ConsoleApplication1\ConsoleApplication1\obj\Release\QNCatchPrice.csprojResolveAssemblyReference.cache
