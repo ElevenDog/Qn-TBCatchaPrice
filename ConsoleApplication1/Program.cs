@@ -83,7 +83,7 @@ namespace ConsoleApplication1
                     url = String.Format(
                     "https://sijipiao.alitrip.com/ie/flight_search_result_poller.do?plk=%2522eyJfcWlkIjoiMGE2N2JjYWUxNDc0OTY1NTAyMzk4NDg1MGUiLCJfc2tleSI6IjE5MmVkMGNlNzhlODQwMjJhZDFlOWI2NDE0ZjM5ZTVjIn0%253D%2522&_ksTS=1474965493066_2274&callback=jsonp2275&supportMultiTrip=true&searchBy=1280&searchJourney=%5B%7B%22arrCityCode%22%3A%22{0}%22%2C%22arrCityName%22%3A%22%25E5%2590%2589%25E9%259A%2586%25E5%259D%25A1%22%2C%22depCityCode%22%3A%22{1}%22%2C%22depCityName%22%3A%22%25E5%25B9%25BF%25E5%25B7%259E%22%2C%22depDate%22%3A%22{2}%22%2C%22selectedFlights%22%3A%5B%7B%22marketFlightNo%22%3A%22{3}%22%2C%22flightTime%22%3A%22{4}%22%7D%5D%7D%5D&tripType=0&searchCabinType=0&agentId=-1&searchMode=2&b2g=0&formNo=-1&cardId=&needMemberPrice=true", arrCity, defCity, time, flightNo, startTime);
                     var json = String.Empty;
-                    // 取价格相关数据
+                    // 提取与价格相关数据
                     json = TryTimeSpan(json, url);
                     index1 = json.IndexOf("productItems", StringComparison.Ordinal);
                     index2 = json.IndexOf("flightInfos", StringComparison.Ordinal);
@@ -91,8 +91,10 @@ namespace ConsoleApplication1
                     end = json.Substring(index2 - 2);
                     json = start.Replace(end, "");
                     json = "{" + json + "}";
+                    // 将json字符串转为对象obj
                     obj = JsonHelper.JsonToObject<Rootobject>(json);
                     int i = 0;
+                    // 循环取代理价格
                     foreach (var pro in obj.productItems)
                     {
                         i++;
@@ -102,6 +104,7 @@ namespace ConsoleApplication1
                             AgentName = pro.agentInfo.showName,
                             AgentRank = i
                         });
+                        // 提取"一路无忧"的价格和排名
                         if (pro.agentInfo.showName.Contains("一路无忧"))
                         {
                             data.Flight.Rank = i;
@@ -196,7 +199,7 @@ namespace ConsoleApplication1
                 GetString(url, cc);
                 url = "http://www.qunar.com/twell/cookie/allocateCookie.jsp";
                 GetString(url, cc);
-
+                // 代理、价格信息字符串
                 object pdata = null;
                 while (tryTime > 0)
                 {
@@ -228,7 +231,7 @@ namespace ConsoleApplication1
                     Console.WriteLine("-------------- No Price Data !!!!!!!!!!!!!!!!!!!!!!!!! " + flightNo);
                     continue;
                 }
-
+                // 需要排除的字符
                 var excluedList = new[] { "TPK", "LPP", "LPN" };
                 foreach (var flightBagPrice in priceData)
                 {
@@ -236,10 +239,12 @@ namespace ConsoleApplication1
                     var bagPrice = flightBagPrice.Value;
                     //var warrpid = flagstr.Split('_')[0];
                     //var cabin = bagPrice.cabin;
+                    // 筛选出符合条件的代理的价格
                     if (flagstr.StartsWith("tt"))
                     {
                         if (excluedList.Any(flagstr.Contains) || (bagPrice.pinfo == null))
                             continue;
+                        // 代理名
                         var pro = bagPrice.pack == 0 ? "代理" : "打包:" + bagPrice.packWrapperName;
                         //var tag = platid == 2 ? "。T" : "。Z";
                         //// 退改签
@@ -288,15 +293,15 @@ namespace ConsoleApplication1
         /// <summary>
         ///     退改签规则获取
         /// </summary>
-        /// <param name="warrpid"></param>
-        /// <param name="pinfo"></param>
-        /// <param name="defCity"></param>
-        /// <param name="arrCity"></param>
-        /// <param name="time"></param>
-        /// <param name="flightNo"></param>
-        /// <param name="cc"></param>
-        /// <param name="pt"></param>
-        /// <param name="cabin"></param>
+        /// <param name="warrpid">URL参数</param>
+        /// <param name="pinfo">URL参数</param>
+        /// <param name="defCity">出发城市码</param>
+        /// <param name="arrCity">目的城市码</param>
+        /// <param name="time">出发日期</param>
+        /// <param name="flightNo">航班号</param>
+        /// <param name="cc">cookie</param>
+        /// <param name="pt">URL参数</param>
+        /// <param name="cabin">URL仓位参数</param>
         /// <returns></returns>
         private static string Tgq(string warrpid, string pinfo, string defCity, string arrCity,
             string time, string flightNo, CookieContainer cc, string pt, string cabin)
@@ -305,7 +310,7 @@ namespace ConsoleApplication1
                 "http://flight.qunar.com/twelli/api/getInterTGQ.jsp?&depCity={0}&arrCity={1}&depDate={2}&flightNo={3}&wrapperId={4}&pInfo={5}&cabin={8}&passengerType=adult&transferAP=&pt={6}&_token={7}",
                 defCity, arrCity, time, flightNo, warrpid, pinfo.Replace("#", "%23"), pt,
                 new Random().Next(10000, 99999), cabin);
-            // 退改签内容
+            // 退改签内容字符串
             var tgq = GetString(url, cc);
             return tgq;
         }
@@ -313,10 +318,10 @@ namespace ConsoleApplication1
         /// <summary>
         ///     获取航班信息
         /// </summary>
-        /// <param name="defCity"></param>
-        /// <param name="arrCity"></param>
-        /// <param name="time"></param>
-        /// <param name="hs"></param>
+        /// <param name="defCity">出发城市码</param>
+        /// <param name="arrCity">目的城市码</param>
+        /// <param name="time">出发日期</param>
+        /// <param name="hs">航司</param>
         /// <returns></returns>
         private static Dictionary<string, object> GetFlightNo(string defCity, string arrCity, string time, string hs)
         {
